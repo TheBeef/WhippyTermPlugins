@@ -1,0 +1,19 @@
+<?xml version="1.0" standalone="no" ?>
+<ExternPluginMaker>
+    <LastBuildFile>/home/paul/Dropbox/Projects/WhippyTerm/WhippyTermPlugin_TextLineFilter/TextLineFilter.wtp</LastBuildFile>
+    <LinuxFilename>/home/paul/Dropbox/Projects/WhippyTerm/WhippyTermPlugin_TextLineFilter/Linux/TextLineFilter.so</LinuxFilename>
+    <WindowsFilename>/home/paul/Dropbox/Projects/WhippyTerm/WhippyTermPlugin_TextLineFilter/Windows/TextLineFilter.dll</WindowsFilename>
+    <MacFilename></MacFilename>
+    <RPI64Filename></RPI64Filename>
+    <RPI32Filename></RPI32Filename>
+    <PluginName>Text Line Filter</PluginName>
+    <InstallFilename>TextLineFilter</InstallFilename>
+    <Description>Filters out lines using regex's or simple string matching.</Description>
+    <Contributors>Paul Hutchinson</Contributors>
+    <Copyright>2025</Copyright>
+    <ReleaseDate>28 Sep 2025</ReleaseDate>
+    <Version>1.0</Version>
+    <APIVersion>2.0</APIVersion>
+    <PluginClass>1</PluginClass>
+    <PluginSubClass>4</PluginSubClass>
+</ExternPluginMaker>

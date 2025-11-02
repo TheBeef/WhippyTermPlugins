@@ -1,0 +1,19 @@
+<?xml version="1.0" standalone="no" ?>
+<ExternPluginMaker>
+    <LastBuildFile>/home/paul/Dropbox/Projects/WhippyTerm/WhippyTermPlugin_RxTxBinaryDisplay/RxTxBinaryDisplay.wtp</LastBuildFile>
+    <LinuxFilename>/home/paul/Dropbox/Projects/WhippyTerm/WhippyTermPlugin_RxTxBinaryDisplay/Linux/RxTxBinaryDisplay.so</LinuxFilename>
+    <WindowsFilename>/home/paul/Dropbox/Projects/WhippyTerm/WhippyTermPlugin_RxTxBinaryDisplay/Windows/RxTxBinaryDisplay.dll</WindowsFilename>
+    <MacFilename></MacFilename>
+    <RPI64Filename></RPI64Filename>
+    <RPI32Filename></RPI32Filename>
+    <PluginName>Rx Tx Binary Display</PluginName>
+    <InstallFilename>RxTxBinaryDisplay</InstallFilename>
+    <Description>Shows incoming and outgoing binary data in different colors</Description>
+    <Contributors>Paul Hutchinson</Contributors>
+    <Copyright>2025</Copyright>
+    <ReleaseDate>28 Sep 2025</ReleaseDate>
+    <Version>1.0</Version>
+    <APIVersion>2.0</APIVersion>
+    <PluginClass>1</PluginClass>
+    <PluginSubClass>4</PluginSubClass>
+</ExternPluginMaker>

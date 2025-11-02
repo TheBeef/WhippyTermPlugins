@@ -1,0 +1,19 @@
+<?xml version="1.0" standalone="no" ?>
+<ExternPluginMaker>
+    <LastBuildFile>/home/paul/Dropbox/Projects/WhippyTerm/WhippyTermPlugin_NewLineProcessor_CR/NewLineProcessorCR.wtp</LastBuildFile>
+    <LinuxFilename>/home/paul/Dropbox/Projects/WhippyTerm/WhippyTermPlugin_NewLineProcessor_CR/Linux/NewLineProcessor.so</LinuxFilename>
+    <WindowsFilename>/home/paul/Dropbox/Projects/WhippyTerm/WhippyTermPlugin_NewLineProcessor_CR/Windows/NewLineProcessor.dll</WindowsFilename>
+    <MacFilename></MacFilename>
+    <RPI64Filename></RPI64Filename>
+    <RPI32Filename></RPI32Filename>
+    <PluginName>New Line Processor CR</PluginName>
+    <InstallFilename>NewLineProcessorCR</InstallFilename>
+    <Description>Does a new line (0x0A) when a carriage return character (0x0D) is read.</Description>
+    <Contributors>Paul Hutchinson</Contributors>
+    <Copyright>2025</Copyright>
+    <ReleaseDate>30 Oct 2025</ReleaseDate>
+    <Version>1.0</Version>
+    <APIVersion>1.0.0.0</APIVersion>
+    <PluginClass>1</PluginClass>
+    <PluginSubClass>4</PluginSubClass>
+</ExternPluginMaker>
