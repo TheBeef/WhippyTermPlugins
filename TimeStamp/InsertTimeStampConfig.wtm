@@ -1,8 +1,8 @@
 <?xml version="1.0" standalone="no" ?>
 <ExternPluginMaker>
-    <LastBuildFile>/home/paul/Dropbox/Projects/WhippyTerm/WhippyTermPlugin_TimeStamp/InsertTimeStamp.wtp</LastBuildFile>
-    <LinuxFilename>/home/paul/Dropbox/Projects/WhippyTerm/WhippyTermPlugin_TimeStamp/Linux/InsertTimeStamp.so</LinuxFilename>
-    <WindowsFilename>/home/paul/Dropbox/Projects/WhippyTerm/WhippyTermPlugin_TimeStamp/Windows/InsertTimeStamp.dll</WindowsFilename>
+    <LastBuildFile>/home/paul/Dropbox/Projects/WhippyTerm/WhippyTermPlugins/TimeStamp/InsertTimeStamp.wtp</LastBuildFile>
+    <LinuxFilename>/home/paul/Dropbox/Projects/WhippyTerm/WhippyTermPlugins/TimeStamp/Linux/InsertTimeStamp.so</LinuxFilename>
+    <WindowsFilename>/home/paul/Dropbox/Projects/WhippyTerm/WhippyTermPlugins/TimeStamp/Windows/InsertTimeStamp.dll</WindowsFilename>
     <MacFilename></MacFilename>
     <RPI64Filename></RPI64Filename>
     <RPI32Filename></RPI32Filename>
@@ -11,8 +11,8 @@
     <Description>Adds a timestamp to the incoming text stream after a new line char.</Description>
     <Contributors>Paul Hutchinson</Contributors>
     <Copyright>2025</Copyright>
-    <ReleaseDate>14 Oct 2025</ReleaseDate>
-    <Version>1.1</Version>
+    <ReleaseDate>07 Nov 2025</ReleaseDate>
+    <Version>1.2</Version>
     <APIVersion>1.0.0.0</APIVersion>
     <PluginClass>1</PluginClass>
     <PluginSubClass>4</PluginSubClass>
