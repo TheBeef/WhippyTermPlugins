@@ -49,13 +49,30 @@ struct InsertTimeStampData
 {
     string DateFormat;
     bool SeenNewLine;
+
+    uint32_t FGColor;
+    uint32_t BGColor;
+    uint32_t Attribs;
 };
 
 struct InsertTimeStamp_SettingsWidgets
 {
-    t_WidgetSysHandle *WidgetHandle;
+    t_WidgetSysHandle *TimestampTabHandle;
+    t_WidgetSysHandle *StyleTabHandle;
+
+    /* Timestamp widgets */
     struct PI_TextInput *DateFormatInput;
     struct PI_TextBox *ExplainInput;
+
+    /* Styling widgets */
+    struct PI_ColorPick *FgColor;
+    struct PI_ColorPick *BgColor;
+    struct PI_Checkbox *AttribUnderLine;
+    struct PI_Checkbox *AttribOverLine;
+    struct PI_Checkbox *AttribLineThrough;
+    struct PI_Checkbox *AttribBold;
+    struct PI_Checkbox *AttribItalic;
+    struct PI_Checkbox *AttribOutLine;
 };
 
 /*** FUNCTION PROTOTYPES      ***/
@@ -321,6 +338,10 @@ void InsertTimeStamp_ProcessIncomingTextByte(t_DataProcessorHandleType *DataHand
     char buff[100];
     time_t current_time;
     struct tm *time_info;
+    uint32_t SavedFGColor;
+    uint32_t SavedBGColor;
+    uint32_t SavedULineColor;
+    uint32_t SavedAttribs;
 
     if(Data->SeenNewLine && RawByte!='\r')
     {
@@ -328,7 +349,26 @@ void InsertTimeStamp_ProcessIncomingTextByte(t_DataProcessorHandleType *DataHand
         time(&current_time);
         time_info = localtime(&current_time);
         strftime(buff,sizeof(buff)-1,Data->DateFormat.c_str(),time_info);
+
+        /* Save the current styling */
+        SavedFGColor=m_ITS_DPS->GetFGColor();
+        SavedBGColor=m_ITS_DPS->GetBGColor();
+        SavedULineColor=m_ITS_DPS->GetULineColor();
+        SavedAttribs=m_ITS_DPS->GetAttribs();
+
+        /* Apply our styling */
+        m_ITS_DPS->SetFGColor(Data->FGColor);
+        m_ITS_DPS->SetBGColor(Data->BGColor);
+        m_ITS_DPS->SetULineColor(Data->FGColor);
+        m_ITS_DPS->SetAttribs(Data->Attribs);
+
         m_ITS_DPS->InsertString((uint8_t *)buff,strlen(buff));
+
+        /* Restore the styling */
+        m_ITS_DPS->SetFGColor(SavedFGColor);
+        m_ITS_DPS->SetBGColor(SavedBGColor);
+        m_ITS_DPS->SetULineColor(SavedULineColor);
+        m_ITS_DPS->SetAttribs(SavedAttribs);
     }
 
     if(RawByte=='\n')
@@ -378,25 +418,42 @@ t_DataProSettingsWidgetsType *InsertTimeStamp_AllocSettingsWidgets(t_WidgetSysHa
 {
     struct InsertTimeStamp_SettingsWidgets *WData;
     const char *Str;
+    uint32_t Num;
 
     try
     {
         WData=new InsertTimeStamp_SettingsWidgets;
-        WData->WidgetHandle=WidgetHandle;
 
         /* Zero everything */
         WData->DateFormatInput=NULL;
         WData->ExplainInput=NULL;
+        WData->TimestampTabHandle=NULL;
+        WData->StyleTabHandle=NULL;
+        WData->FgColor=NULL;
+        WData->BgColor=NULL;
+        WData->AttribUnderLine=NULL;
+        WData->AttribOverLine=NULL;
+        WData->AttribLineThrough=NULL;
+        WData->AttribBold=NULL;
+        WData->AttribItalic=NULL;
+        WData->AttribOutLine=NULL;
 
-        /* Add widgets */
+        /* Timestamp tab */
+        WData->TimestampTabHandle=WidgetHandle;
         m_ITS_DPS->SetCurrentSettingsTabName("Timestamp");
 
-        WData->DateFormatInput=m_ITS_UIAPI->AddTextInput(WidgetHandle,
-                "Date Format",NULL,NULL);
+        /* Styling tab */
+        WData->StyleTabHandle=m_ITS_DPS->AddNewSettingsTab("Styling");
+        if(WData->StyleTabHandle==NULL)
+            throw(0);
+
+        /* Add timestamp widgets */
+        WData->DateFormatInput=m_ITS_UIAPI->AddTextInput(
+                WData->TimestampTabHandle,"Date Format",NULL,NULL);
         if(WData->DateFormatInput==NULL)
             throw(0);
 
-        WData->ExplainInput=m_ITS_UIAPI->AddTextBox(WidgetHandle,
+        WData->ExplainInput=m_ITS_UIAPI->AddTextBox(WData->TimestampTabHandle,
                 "Help",
                 "The date format uses the same format as strftime():\n\n"
                 "%a -- Abbreviated name of the day of the week\n"
@@ -428,12 +485,117 @@ t_DataProSettingsWidgetsType *InsertTimeStamp_AllocSettingsWidgets(t_WidgetSysHa
         if(WData->ExplainInput==NULL)
             throw(0);
 
+        /* Add styling widgets */
+        WData->FgColor=m_ITS_UIAPI->AddColorPick(WData->StyleTabHandle,
+                "Forground Color",0x000000,NULL,NULL);
+        if(WData->FgColor==NULL)
+            throw(0);
+
+        WData->BgColor=m_ITS_UIAPI->AddColorPick(WData->StyleTabHandle,
+                "Background Color",0x000000,NULL,NULL);
+        if(WData->BgColor==NULL)
+            throw(0);
+
+        WData->AttribUnderLine=m_ITS_UIAPI->AddCheckbox(WData->StyleTabHandle,
+                "Underline",NULL,NULL);
+        if(WData->AttribUnderLine==NULL)
+            throw(0);
+
+        WData->AttribOverLine=m_ITS_UIAPI->AddCheckbox(WData->StyleTabHandle,
+                "Overline",NULL,NULL);
+        if(WData->AttribOverLine==NULL)
+            throw(0);
+
+        WData->AttribLineThrough=m_ITS_UIAPI->AddCheckbox(WData->StyleTabHandle,
+                "Line through",NULL,NULL);
+        if(WData->AttribLineThrough==NULL)
+            throw(0);
+
+        WData->AttribBold=m_ITS_UIAPI->AddCheckbox(WData->StyleTabHandle,
+                "Bold",NULL,NULL);
+        if(WData->AttribBold==NULL)
+            throw(0);
+
+        WData->AttribItalic=m_ITS_UIAPI->AddCheckbox(WData->StyleTabHandle,
+                "Italic",NULL,NULL);
+        if(WData->AttribItalic==NULL)
+            throw(0);
+
+        WData->AttribOutLine=m_ITS_UIAPI->AddCheckbox(WData->StyleTabHandle,
+                "Outline",NULL,NULL);
+        if(WData->AttribOutLine==NULL)
+            throw(0);
+
         /* Set widgets to stored settings */
         Str=m_ITS_SysAPI->KVGetItem(Settings,"DateFormat");
         if(Str==NULL)
             Str="%c:";
-        m_ITS_UIAPI->SetTextInputText(WidgetHandle,WData->DateFormatInput->Ctrl,
-                Str);
+        m_ITS_UIAPI->SetTextInputText(WData->TimestampTabHandle,
+                WData->DateFormatInput->Ctrl,Str);
+
+        Str=m_ITS_SysAPI->KVGetItem(Settings,"FGColor");
+        if(Str!=NULL)
+            Num=strtol(Str,NULL,16);
+        else
+            Num=m_ITS_DPS->GetSysDefaultColor(e_DefaultColors_FG);
+        m_ITS_UIAPI->SetColorPickValue(WData->StyleTabHandle,
+                WData->FgColor->Ctrl,Num);
+
+        Str=m_ITS_SysAPI->KVGetItem(Settings,"BGColor");
+        if(Str!=NULL)
+            Num=strtol(Str,NULL,16);
+        else
+            Num=m_ITS_DPS->GetSysDefaultColor(e_DefaultColors_BG);
+        m_ITS_UIAPI->SetColorPickValue(WData->StyleTabHandle,
+                WData->BgColor->Ctrl,Num);
+
+        Str=m_ITS_SysAPI->KVGetItem(Settings,"AttribUnderLine");
+        if(Str!=NULL)
+            Num=strtol(Str,NULL,10);
+        else
+            Num=0;
+        m_ITS_UIAPI->SetCheckboxChecked(WData->StyleTabHandle,
+                WData->AttribUnderLine->Ctrl,Num?true:false);
+
+        Str=m_ITS_SysAPI->KVGetItem(Settings,"AttribOverLine");
+        if(Str!=NULL)
+            Num=strtol(Str,NULL,10);
+        else
+            Num=0;
+        m_ITS_UIAPI->SetCheckboxChecked(WData->StyleTabHandle,
+                WData->AttribOverLine->Ctrl,Num?true:false);
+
+        Str=m_ITS_SysAPI->KVGetItem(Settings,"AttribLineThrough");
+        if(Str!=NULL)
+            Num=strtol(Str,NULL,10);
+        else
+            Num=0;
+        m_ITS_UIAPI->SetCheckboxChecked(WData->StyleTabHandle,
+                WData->AttribLineThrough->Ctrl,Num?true:false);
+
+        Str=m_ITS_SysAPI->KVGetItem(Settings,"AttribBold");
+        if(Str!=NULL)
+            Num=strtol(Str,NULL,10);
+        else
+            Num=0;
+        m_ITS_UIAPI->SetCheckboxChecked(WData->StyleTabHandle,
+                WData->AttribBold->Ctrl,Num?true:false);
+
+        Str=m_ITS_SysAPI->KVGetItem(Settings,"AttribItalic");
+        if(Str!=NULL)
+            Num=strtol(Str,NULL,10);
+        else
+            Num=0;
+        m_ITS_UIAPI->SetCheckboxChecked(WData->StyleTabHandle,
+                WData->AttribItalic->Ctrl,Num?true:false);
+
+        Str=m_ITS_SysAPI->KVGetItem(Settings,"AttribOutLine");
+        if(Str!=NULL)
+            Num=strtol(Str,NULL,10);
+        else
+            Num=0;
+        m_ITS_UIAPI->SetCheckboxChecked(WData->StyleTabHandle,
+                WData->AttribOutLine->Ctrl,Num?true:false);
     }
     catch(...)
     {
@@ -473,11 +635,31 @@ void InsertTimeStamp_FreeSettingsWidgets(t_DataProSettingsWidgetsType *PrivData)
     struct InsertTimeStamp_SettingsWidgets *WData=(struct InsertTimeStamp_SettingsWidgets *)PrivData;
 
     /* Free everything in reverse order */
+    if(WData->AttribOutLine!=NULL)
+        m_ITS_UIAPI->FreeCheckbox(WData->StyleTabHandle,WData->AttribOutLine);
+    if(WData->AttribItalic!=NULL)
+        m_ITS_UIAPI->FreeCheckbox(WData->StyleTabHandle,WData->AttribItalic);
+    if(WData->AttribBold!=NULL)
+        m_ITS_UIAPI->FreeCheckbox(WData->StyleTabHandle,WData->AttribBold);
+    if(WData->AttribLineThrough!=NULL)
+        m_ITS_UIAPI->FreeCheckbox(WData->StyleTabHandle,WData->AttribLineThrough);
+    if(WData->AttribOverLine!=NULL)
+        m_ITS_UIAPI->FreeCheckbox(WData->StyleTabHandle,WData->AttribOverLine);
+    if(WData->AttribUnderLine!=NULL)
+        m_ITS_UIAPI->FreeCheckbox(WData->StyleTabHandle,WData->AttribUnderLine);
+    if(WData->BgColor!=NULL)
+        m_ITS_UIAPI->FreeColorPick(WData->StyleTabHandle,WData->BgColor);
+    if(WData->FgColor!=NULL)
+        m_ITS_UIAPI->FreeColorPick(WData->StyleTabHandle,WData->FgColor);
+
     if(WData->DateFormatInput!=NULL)
-        m_ITS_UIAPI->FreeTextInput(WData->WidgetHandle,WData->DateFormatInput);
+    {
+        m_ITS_UIAPI->FreeTextInput(WData->TimestampTabHandle,
+                WData->DateFormatInput);
+    }
 
     if(WData->ExplainInput!=NULL)
-        m_ITS_UIAPI->FreeTextBox(WData->WidgetHandle,WData->ExplainInput);
+        m_ITS_UIAPI->FreeTextBox(WData->TimestampTabHandle,WData->ExplainInput);
 
     delete WData;
 }
@@ -508,10 +690,52 @@ void InsertTimeStamp_SetSettingsFromWidgets(t_DataProSettingsWidgetsType *PrivDa
 {
     struct InsertTimeStamp_SettingsWidgets *WData=(struct InsertTimeStamp_SettingsWidgets *)PrivData;
     string Str;
+    char buff[21];
+    uint32_t Value;
 
-    Str=m_ITS_UIAPI->GetTextInputText(WData->WidgetHandle,
+    Str=m_ITS_UIAPI->GetTextInputText(WData->TimestampTabHandle,
             WData->DateFormatInput->Ctrl);
     m_ITS_SysAPI->KVAddItem(Settings,"DateFormat",Str.c_str());
+
+    Value=m_ITS_UIAPI->GetColorPickValue(WData->StyleTabHandle,
+            WData->FgColor->Ctrl);
+    sprintf(buff,"%06X",Value);
+    m_ITS_SysAPI->KVAddItem(Settings,"FGColor",buff);
+
+    Value=m_ITS_UIAPI->GetColorPickValue(WData->StyleTabHandle,
+            WData->BgColor->Ctrl);
+    sprintf(buff,"%06X",Value);
+    m_ITS_SysAPI->KVAddItem(Settings,"BGColor",buff);
+
+    Value=m_ITS_UIAPI->IsCheckboxChecked(WData->StyleTabHandle,
+            WData->AttribUnderLine->Ctrl);
+    sprintf(buff,"%d",Value);
+    m_ITS_SysAPI->KVAddItem(Settings,"AttribUnderLine",buff);
+
+    Value=m_ITS_UIAPI->IsCheckboxChecked(WData->StyleTabHandle,
+            WData->AttribOverLine->Ctrl);
+    sprintf(buff,"%d",Value);
+    m_ITS_SysAPI->KVAddItem(Settings,"AttribOverLine",buff);
+
+    Value=m_ITS_UIAPI->IsCheckboxChecked(WData->StyleTabHandle,
+            WData->AttribLineThrough->Ctrl);
+    sprintf(buff,"%d",Value);
+    m_ITS_SysAPI->KVAddItem(Settings,"AttribLineThrough",buff);
+
+    Value=m_ITS_UIAPI->IsCheckboxChecked(WData->StyleTabHandle,
+            WData->AttribBold->Ctrl);
+    sprintf(buff,"%d",Value);
+    m_ITS_SysAPI->KVAddItem(Settings,"AttribBold",buff);
+
+    Value=m_ITS_UIAPI->IsCheckboxChecked(WData->StyleTabHandle,
+            WData->AttribItalic->Ctrl);
+    sprintf(buff,"%d",Value);
+    m_ITS_SysAPI->KVAddItem(Settings,"AttribItalic",buff);
+
+    Value=m_ITS_UIAPI->IsCheckboxChecked(WData->StyleTabHandle,
+            WData->AttribOutLine->Ctrl);
+    sprintf(buff,"%d",Value);
+    m_ITS_SysAPI->KVAddItem(Settings,"AttribOutLine",buff);
 }
 
 /*******************************************************************************
@@ -543,9 +767,51 @@ static void InsertTimeStamp_ApplySettings(t_DataProcessorHandleType *DataHandle,
 {
     struct InsertTimeStampData *Data=(struct InsertTimeStampData *)DataHandle;
     const char *Str;
+    uint32_t Num;
 
     Str=m_ITS_SysAPI->KVGetItem(Settings,"DateFormat");
     if(Str==NULL)
         Str="%c:";
     Data->DateFormat=Str;
+
+    /* Styles */
+    Data->Attribs=0;
+
+    Str=m_ITS_SysAPI->KVGetItem(Settings,"FGColor");
+    if(Str!=NULL)
+        Num=strtol(Str,NULL,16);
+    else
+        Num=m_ITS_DPS->GetSysDefaultColor(e_DefaultColors_FG);
+    Data->FGColor=Num;
+
+    Str=m_ITS_SysAPI->KVGetItem(Settings,"BGColor");
+    if(Str!=NULL)
+        Num=strtol(Str,NULL,16);
+    else
+        Num=m_ITS_DPS->GetSysDefaultColor(e_DefaultColors_FG);
+    Data->BGColor=Num;
+
+    Str=m_ITS_SysAPI->KVGetItem(Settings,"AttribUnderLine");
+    if(Str!=NULL && atoi(Str))
+        Data->Attribs|=TXT_ATTRIB_UNDERLINE;
+
+    Str=m_ITS_SysAPI->KVGetItem(Settings,"AttribOverLine");
+    if(Str!=NULL && atoi(Str))
+        Data->Attribs|=TXT_ATTRIB_OVERLINE;
+
+    Str=m_ITS_SysAPI->KVGetItem(Settings,"AttribLineThrough");
+    if(Str!=NULL && atoi(Str))
+        Data->Attribs|=TXT_ATTRIB_LINETHROUGH;
+
+    Str=m_ITS_SysAPI->KVGetItem(Settings,"AttribBold");
+    if(Str!=NULL && atoi(Str))
+        Data->Attribs|=TXT_ATTRIB_BOLD;
+
+    Str=m_ITS_SysAPI->KVGetItem(Settings,"AttribItalic");
+    if(Str!=NULL && atoi(Str))
+        Data->Attribs|=TXT_ATTRIB_ITALIC;
+
+    Str=m_ITS_SysAPI->KVGetItem(Settings,"AttribOutLine");
+    if(Str!=NULL && atoi(Str))
+        Data->Attribs|=TXT_ATTRIB_OUTLINE;
 }
