@@ -788,7 +788,7 @@ static void InsertTimeStamp_ApplySettings(t_DataProcessorHandleType *DataHandle,
     if(Str!=NULL)
         Num=strtol(Str,NULL,16);
     else
-        Num=m_ITS_DPS->GetSysDefaultColor(e_DefaultColors_FG);
+        Num=m_ITS_DPS->GetSysDefaultColor(e_DefaultColors_BG);
     Data->BGColor=Num;
 
     Str=m_ITS_SysAPI->KVGetItem(Settings,"AttribUnderLine");
